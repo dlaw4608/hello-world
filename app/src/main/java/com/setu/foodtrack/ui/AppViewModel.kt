@@ -6,8 +6,11 @@ package com.setu.foodtrack.ui
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.setu.foodtrack.data.FoodItem
 import com.setu.foodtrack.data.repository.FoodRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -15,41 +18,25 @@ import org.json.JSONObject
 
 
 class AppViewModel(private val repository: FoodRepository) : ViewModel() {
-
-    private val _foods = MutableLiveData<List<FoodItem>>()
-    val foods: LiveData<List<FoodItem>> = _foods
-
+    private val _foods = MutableLiveData<String>()
+    val foods: LiveData<String> = _foods
 
     fun fetchFoods(query: String) {
-        repository.searchFoods(query).enqueue(object : Callback<String> {
-            override fun onResponse(call: Call<String>, response: Response<String>) {
-                if (response.isSuccessful) {
-                    val parsedFoods = parseFoods(response.body() ?: "")
-                    _foods.postValue(parsedFoods)
-                } else {
-                    _foods.postValue(emptyList())
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.searchFoods(query).enqueue(object : Callback<String> {
+                override fun onResponse(call: Call<String>, response: Response<String>) {
+                    if (response.isSuccessful) {
+                        // Assuming response.body() is a String
+                        _foods.postValue(response.body())
+                    } else {
+                        _foods.postValue("Error: ${response.errorBody()?.string()}")
+                    }
                 }
-            }
 
-            override fun onFailure(call: Call<String>, t: Throwable) {
-                _foods.postValue(emptyList())
-            }
-        })
-
-    }
-    private fun parseFoods(jsonString: String): List<FoodItem> {
-        val foodItems = mutableListOf<FoodItem>()
-        val jsonObject = JSONObject(jsonString)
-        val foodsArray = jsonObject.getJSONArray("foods")
-
-        for (i in 0 until foodsArray.length()) {
-            val food = foodsArray.getJSONObject(i)
-            val name = food.getString("food_name")
-            val calories = food.getDouble("calories")
-            foodItems.add(FoodItem(name, calories))
+                override fun onFailure(call: Call<String>, t: Throwable) {
+                    _foods.postValue("Failure: ${t.message}")
+                }
+            })
         }
-
-        return foodItems
     }
-
 }

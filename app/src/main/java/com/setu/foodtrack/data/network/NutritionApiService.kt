@@ -8,10 +8,10 @@ import retrofit2.http.Query
 
 interface NutritionApiService {
     @Headers(
-        "x-app-id: YOUR_APP_ID",
-        "x-app-key: YOUR_API_KEY"
+        "x-app-id: d96b55c7",
+        "x-app-key: a967ba00a90c17ef496a6605ff32778c"
     )
-    @GET("foods/search")
+    @GET("search/instant")
     fun searchFoods(
         @Query("query") query: String
     ): Call<String>
