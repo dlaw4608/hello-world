@@ -14,7 +14,7 @@ fun FoodSearchScreen(viewModel: AppViewModel = viewModel()) {
     var searchText by remember { mutableStateOf("") }
 
 
-    val foods = viewModel.foods.observeAsState("")
+    val foods = viewModel.foods.observeAsState(initial = emptyList())
 
     Column {
         BasicTextField(
@@ -31,6 +31,8 @@ fun FoodSearchScreen(viewModel: AppViewModel = viewModel()) {
             Text("Search")
         }
 
-        Text(text = foods.value)
+        foods.value.forEach { food ->
+            Text(text = "Food: ${food.name}")
+        }
     }
 }

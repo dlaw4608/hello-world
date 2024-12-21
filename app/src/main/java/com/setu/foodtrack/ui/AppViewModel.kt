@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.setu.foodtrack.data.FoodItem
+import com.setu.foodtrack.data.FoodItemResponse
 import com.setu.foodtrack.data.repository.FoodRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -19,23 +20,23 @@ import org.json.JSONObject
 
 
 class AppViewModel(private val repository: FoodRepository) : ViewModel() {
-    private val _foods = MutableLiveData<String>()
-    val foods: LiveData<String> = _foods
+    private val _foods = MutableLiveData<List<FoodItem>>()
+    val foods: LiveData<List<FoodItem>> = _foods
 
     fun fetchFoods(query: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.searchFoods(query).enqueue(object : Callback<ResponseBody> {
-                override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+            repository.searchFoods(query).enqueue(object : Callback<FoodItemResponse> {
+                override fun onResponse(call: Call<FoodItemResponse>, response: Response<FoodItemResponse>) {
                     if (response.isSuccessful) {
 
-                        _foods.postValue(response.body()?.string())
+                        _foods.postValue(response.body()?.common ?: emptyList())
                     } else {
-                        _foods.postValue("Error: ${response.errorBody()?.string()}")
+                        _foods.postValue(emptyList())
                     }
                 }
 
-                override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                    _foods.postValue("Failure: ${t.message}")
+                override fun onFailure(call: Call<FoodItemResponse>, t: Throwable) {
+                    _foods.postValue(emptyList())
                 }
             })
         }

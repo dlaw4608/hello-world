@@ -6,6 +6,7 @@ import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.Query
 import com.setu.foodtrack.data.FoodItem
+import com.setu.foodtrack.data.FoodItemResponse
 import okhttp3.ResponseBody
 
 interface NutritionApiService {
@@ -16,5 +17,5 @@ interface NutritionApiService {
     @GET("search/instant")
     fun searchFoods(
         @Query("query") query: String
-    ): Call<ResponseBody>
+    ): Call<FoodItemResponse>
 }
