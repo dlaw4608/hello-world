@@ -1,5 +1,5 @@
 package com.setu.foodtrack.ui
-
+/*https://hardiksachan.com/how-to-create-a-search-view-in-jetpack-compose-a-step-by-step-guide*/
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Button
@@ -13,7 +13,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 fun FoodSearchScreen(viewModel: AppViewModel = viewModel()) {
     var searchText by remember { mutableStateOf("") }
 
-    // Observing changes in the LiveData from ViewModel
+
     val foods = viewModel.foods.observeAsState("")
 
     Column {
@@ -31,6 +31,6 @@ fun FoodSearchScreen(viewModel: AppViewModel = viewModel()) {
             Text("Search")
         }
 
-        Text(text = foods.value) // Displaying the result
+        Text(text = foods.value)
     }
 }
